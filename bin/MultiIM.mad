@@ -1,0 +1,22 @@
+MAD1:gui:http://paradox.blueprintit.co.uk/mad/MultiIM/MultiIM.mad
+
+[api]
+URL=api.jar
+title=MultiIM core API
+class=com.blueprintit.multiim.MultiIM
+version=0.8
+
+[gui]
+URL=gui.jar
+title=MultiIM Graphical User Interface
+class=com.blueprintit.multiim.gui.BuddyList
+version=0.7
+requires=api
+
+[yahoo]
+URL=yahoo.jar
+title=Yahoo Messenger Service
+class=com.blueprintit.multiim.yahoo.Yahoo
+version=0.8
+requires=api
+autoload=true

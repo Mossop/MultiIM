@@ -1,0 +1,71 @@
+<project name="MultiIM" default="modules" basedir=".">
+
+	<target name="-stdbuild" description="Simple build">
+		<tstamp/>
+		<echo level="verbose">Compiling from ${source_dir} to ${target_dir}</echo>
+		<mkdir dir="${target_dir}"/>
+		<depend srcdir="${source_dir}" destdir="${target_dir}" cache="${source_dir}" closure="true"/>
+		<javac deprecation="on" srcdir="${source_dir}" includes="**/*.java" destdir="${target_dir}" source="1.4">
+			<classpath refid="classpath"/>
+		</javac>
+		<mkdir dir="${target_dir}/META-INF"/>
+		<delete quiet="true" file="${target_dir}/META-INF/build.properties"/>
+		<echo file="${target_dir}/META-INF/build.properties" append="yes">build.date=${DSTAMP}${line.separator}</echo>
+		<echo file="${target_dir}/META-INF/build.properties" append="yes">build.time=${TSTAMP}${line.separator}</echo>
+	</target>
+	
+	<target name="-module" description="Sets up for building a module">
+		<echo level="verbose">Building ${module}</echo>
+		<property name="module_classes" value="${basedir}/classes/${module}"/>
+		<path id="moduleclasspath">
+			<path refid="baseclasspath"/>
+			<pathelement location="${basedir}/bin/loader.jar"/>
+			<path path="${module_classes}"/>
+		</path>
+		<antcall target="-stdbuild">
+			<reference refid="moduleclasspath" torefid="classpath"/>
+			<param name="target_dir" value="${module_classes}"/>
+			<param name="source_dir" value="${basedir}/modules/${module}"/>
+		</antcall>
+		<jar jarfile="${basedir}/bin/modules/${module}.jar">
+			<fileset dir="${module_classes}"/>
+			<fileset dir="${basedir}/resources/${module}"/>
+		</jar>
+	</target>
+
+	<target name="api">
+		<path id="baseclasspath">
+		</path>
+		<antcall target="-module">
+			<param name="module" value="api"/>
+			<reference refid="baseclasspath"/>
+		</antcall>
+	</target>
+
+	<target name="yahoo" depends="api">
+		<path id="baseclasspath">
+			<path path="${basedir}/classes/api"/>
+		</path>
+		<antcall target="-module">
+			<param name="module" value="yahoo"/>
+			<reference refid="baseclasspath"/>
+		</antcall>
+	</target>
+
+	<target name="gui" depends="api">
+		<path id="baseclasspath">
+			<path path="${basedir}/classes/api"/>
+		</path>
+		<antcall target="-module">
+			<param name="module" value="gui"/>
+			<reference refid="baseclasspath"/>
+		</antcall>
+	</target>
+	
+	<target name="modules">
+		<antcall target="api"/>
+		<antcall target="gui"/>
+		<antcall target="yahoo"/>
+	</target>
+
+</project>
